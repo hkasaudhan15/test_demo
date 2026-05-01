@@ -1,5 +1,6 @@
 using CleanArch.CrossCutting.MultiTenancy.Abstractions;
 using CleanArch.Domain.Abstractions.Repositories;
+using CleanArch.Domain.Products;
 using CleanArch.Infrastructure.Persistence.EFCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,8 +26,8 @@ public sealed class ApplicationDbContext : DbContext, IUnitOfWork
         _tenantProvider = tenantProvider;
     }
 
-    // ─── Register DbSets here ───────────────────────────
-    // public DbSet<YourEntity> YourEntities => Set<YourEntity>();
+    // ─── DbSets ──────────────────────────────────────────
+    public DbSet<Product> Products => Set<Product>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
