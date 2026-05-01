@@ -1,19 +1,31 @@
 namespace CleanArch.CrossCutting.Idempotency;
 
 /// <summary>
-/// Stores processed idempotent requests to prevent duplicate processing.
+/// Records a processed idempotent request so duplicate submissions
+/// (same <see cref="IdempotencyKey"/>) are rejected or return
+/// the previously stored response.
+///
+/// Lifecycle:
+///   1. Client sends a command with <c>X-Idempotency-Key</c> header.
+///   2. <see cref="IdempotencyBehavior{TRequest,TResponse}"/> checks this table.
+///   3. If the key exists → return <see cref="ErrorCodes.Idempotency.AlreadyProcessed"/>.
+///   4. If absent → execute the command, then insert a row here.
 /// </summary>
 public sealed class IdempotentRequest
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public DateTime CreatedOnUtc { get; set; }
-}
+    private IdempotentRequest() { } // EF Core
 
-/// <summary>
-/// Marker interface for commands that require idempotency.
-/// </summary>
-public interface IIdempotentCommand
-{
-    Guid IdempotencyKey { get; }
+    public Guid Id { get; private set; }
+    public string CommandName { get; private set; } = string.Empty;
+    public DateTime CreatedOnUtc { get; private set; }
+
+    public static IdempotentRequest Create(Guid idempotencyKey, string commandName, DateTime utcNow)
+    {
+        return new IdempotentRequest
+        {
+            Id = idempotencyKey,
+            CommandName = commandName,
+            CreatedOnUtc = utcNow
+        };
+    }
 }

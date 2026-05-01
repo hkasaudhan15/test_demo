@@ -2,6 +2,7 @@ using CleanArch.Application.Abstractions.Authentication;
 using CleanArch.Application.Abstractions.Caching;
 using CleanArch.Application.Abstractions.Clock;
 using CleanArch.Application.Abstractions.Data;
+using CleanArch.Application.Abstractions.Idempotency;
 using CleanArch.CrossCutting.Outbox;
 using CleanArch.CrossCutting.Outbox.Interceptors;
 using CleanArch.Domain.Abstractions.Repositories;
@@ -9,6 +10,7 @@ using CleanArch.Infrastructure.Authentication.Jwt;
 using CleanArch.Infrastructure.Caching.Redis;
 using CleanArch.Infrastructure.Clock;
 using CleanArch.Infrastructure.HealthChecks;
+using CleanArch.Infrastructure.Idempotency;
 using CleanArch.Infrastructure.Persistence.EFCore.Context;
 using CleanArch.Infrastructure.Persistence.EFCore.Interceptors;
 using CleanArch.Infrastructure.Persistence.EFCore.Repositories;
@@ -64,6 +66,9 @@ public static class DependencyInjection
         // ── Unit of Work + Repositories ─────────────────
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
         services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+
+        // ── Idempotency ──────────────────────────────────
+        services.AddScoped<IIdempotencyService, IdempotencyService>();
 
         // ── Dapper connection factory ───────────────────
         services.AddSingleton<IDbConnectionFactory>(_ =>
