@@ -7,10 +7,13 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace CleanArch.CrossCutting.Outbox.Interceptors;
 
 /// <summary>
-/// EF Core interceptor that converts domain events into outbox messages
-/// within the same transaction as the aggregate save. Events are captured
-/// in SavingChanges (pre-save) and written to the OutboxMessages table
-/// so they participate in the same commit — guaranteeing atomicity.
+/// EF Core interceptor that converts domain events into
+/// <see cref="OutboxMessage"/> records within the same transaction
+/// as the aggregate save.
+///
+/// Intercepts <c>SavingChanges</c> (pre-save) so outbox rows participate
+/// in the same commit — guaranteeing atomicity between the aggregate
+/// state change and the event publication intent.
 /// </summary>
 public sealed class OutboxInterceptor : SaveChangesInterceptor
 {
@@ -59,14 +62,12 @@ public sealed class OutboxInterceptor : SaveChangesInterceptor
         {
             foreach (var domainEvent in entity.DomainEvents)
             {
-                outboxMessages.Add(new OutboxMessage
-                {
-                    Id = Guid.NewGuid(),
-                    Type = domainEvent.GetType().AssemblyQualifiedName!,
-                    Content = JsonSerializer.Serialize(domainEvent, domainEvent.GetType(), SerializerOptions),
-                    OccurredOnUtc = domainEvent.OccurredOnUtc,
-                    RetryCount = 0
-                });
+                var message = OutboxMessage.Create(
+                    eventType: domainEvent.GetType().AssemblyQualifiedName!,
+                    payload: JsonSerializer.Serialize(domainEvent, domainEvent.GetType(), SerializerOptions),
+                    occurredOnUtc: domainEvent.OccurredOnUtc);
+
+                outboxMessages.Add(message);
             }
 
             entity.ClearDomainEvents();

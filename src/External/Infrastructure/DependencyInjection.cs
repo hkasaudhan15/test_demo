@@ -1,10 +1,9 @@
-using System.Reflection;
 using CleanArch.Application.Abstractions.Authentication;
 using CleanArch.Application.Abstractions.Caching;
 using CleanArch.Application.Abstractions.Clock;
 using CleanArch.Application.Abstractions.Data;
-using CleanArch.Application.Abstractions.Notifications;
-using CleanArch.Application.Abstractions.Storage;
+using CleanArch.CrossCutting.Outbox;
+using CleanArch.CrossCutting.Outbox.Interceptors;
 using CleanArch.Domain.Abstractions.Repositories;
 using CleanArch.Infrastructure.Authentication.Jwt;
 using CleanArch.Infrastructure.Caching.Redis;
@@ -29,12 +28,18 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // ── EF Core ─────────────────────────────────────
-        // Interceptors must be Scoped — they depend on Scoped services
+        // ── EF Core Interceptors ─────────────────────────
+        // Scoped interceptors depend on Scoped services
         // (ICurrentUserService, IPublisher, IDateTimeProvider)
         services.AddScoped<AuditableEntityInterceptor>();
         services.AddScoped<SoftDeleteInterceptor>();
-        services.AddScoped<DomainEventDispatcherInterceptor>();
+
+        // ── Outbox Pattern ───────────────────────────────
+        // Registers OutboxInterceptor (singleton) + OutboxProcessor (hosted service)
+        // + OutboxOptions from appsettings. When outbox is active, the
+        // DomainEventDispatcherInterceptor is NOT registered — events are
+        // published reliably via the outbox background processor instead.
+        services.AddOutbox(configuration);
 
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
@@ -50,8 +55,11 @@ public static class DependencyInjection
             options.AddInterceptors(
                 sp.GetRequiredService<AuditableEntityInterceptor>(),
                 sp.GetRequiredService<SoftDeleteInterceptor>(),
-                sp.GetRequiredService<DomainEventDispatcherInterceptor>());
+                sp.GetRequiredService<OutboxInterceptor>());
         });
+
+        // Also register as DbContext so CrossCutting (OutboxProcessor) can resolve it
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
         // ── Unit of Work + Repositories ─────────────────
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
@@ -87,4 +95,3 @@ public static class DependencyInjection
         return services;
     }
 }
-
