@@ -48,7 +48,7 @@ public sealed class OutboxInterceptor : SaveChangesInterceptor
     private static void ConvertDomainEventsToOutboxMessages(DbContext context)
     {
         var entities = context.ChangeTracker
-            .Entries<Entity>()
+            .Entries<IHasDomainEvents>()
             .Where(e => e.Entity.DomainEvents.Count != 0)
             .Select(e => e.Entity)
             .ToList();

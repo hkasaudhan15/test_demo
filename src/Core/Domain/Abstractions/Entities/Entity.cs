@@ -1,47 +1,20 @@
-using CleanArch.Domain.Abstractions.Events;
-
 namespace CleanArch.Domain.Abstractions.Entities;
 
 /// <summary>
-/// Base entity with identity, audit fields, soft-delete, and domain event support.
-/// Every entity in the system inherits from this.
+/// Base entity — provides identity and structural equality.
+/// Cross-cutting concerns (auditing, soft-delete, domain events) are
+/// expressed via composable interfaces: <see cref="IAuditableEntity"/>,
+/// <see cref="ISoftDeletable"/>, <see cref="IHasDomainEvents"/>.
+/// This keeps the base class thin and lets entities opt into only the
+/// behaviors they need — following the Interface Segregation Principle.
 /// </summary>
 public abstract class Entity : IEquatable<Entity>
 {
-    private readonly List<IDomainEvent> _domainEvents = [];
-
-    protected Entity(Guid id)
-    {
-        Id = id;
-    }
+    protected Entity(Guid id) => Id = id;
 
     protected Entity() { } // EF Core
 
     public Guid Id { get; private init; }
-
-    // ─── Audit Fields ───────────────────────────────────
-    public DateTime CreatedOnUtc { get; internal set; }
-    public string? CreatedBy { get; internal set; }
-    public DateTime? ModifiedOnUtc { get; internal set; }
-    public string? ModifiedBy { get; internal set; }
-
-    // ─── Soft Delete ────────────────────────────────────
-    public bool IsDeleted { get; internal set; }
-    public DateTime? DeletedOnUtc { get; internal set; }
-    public string? DeletedBy { get; internal set; }
-
-    // ─── Domain Events ──────────────────────────────────
-    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
-
-    public void RaiseDomainEvent(IDomainEvent domainEvent)
-    {
-        _domainEvents.Add(domainEvent);
-    }
-
-    public void ClearDomainEvents()
-    {
-        _domainEvents.Clear();
-    }
 
     // ─── Equality ───────────────────────────────────────
     public bool Equals(Entity? other)
@@ -58,7 +31,7 @@ public abstract class Entity : IEquatable<Entity>
 
     public static bool operator ==(Entity? left, Entity? right)
     {
-        return left is null && right is null || 
+        return left is null && right is null ||
                left is not null && right is not null && left.Equals(right);
     }
 

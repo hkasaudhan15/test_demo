@@ -1,14 +1,17 @@
-using System.Linq.Expressions;
-using CleanArch.Domain.Abstractions.Entities;
 using CleanArch.Domain.Abstractions.Repositories;
+using CleanArch.Infrastructure.Persistence.EFCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Infrastructure.Persistence.EFCore.Context;
 
 /// <summary>
-/// Application DbContext — Central data access point.
-/// Implements IUnitOfWork for transactional consistency.
-/// Domain events are dispatched post-SaveChanges via DomainEventDispatcherInterceptor.
+/// Application DbContext — central data access point.
+/// Implements <see cref="IUnitOfWork"/> for transactional consistency.
+///
+/// Domain conventions (audit fields, soft-delete filters, concurrency tokens,
+/// domain event exclusion) are applied automatically via
+/// <see cref="ModelBuilderExtensions.ApplyDomainConventions"/> so individual
+/// entity configurations only need to declare their own table-specific mappings.
 /// </summary>
 public sealed class ApplicationDbContext : DbContext, IUnitOfWork
 {
@@ -22,22 +25,16 @@ public sealed class ApplicationDbContext : DbContext, IUnitOfWork
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // 1. Apply all IEntityTypeConfiguration<T> from Infrastructure assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
-        // Global query filter for soft-delete
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        {
-            if (typeof(Entity).IsAssignableFrom(entityType.ClrType))
-            {
-                modelBuilder.Entity(entityType.ClrType)
-                    .HasQueryFilter(GenerateSoftDeleteFilter(entityType.ClrType));
-            }
-        }
+        // 2. Apply domain conventions (audit, soft-delete, concurrency, events)
+        modelBuilder.ApplyDomainConventions();
 
         base.OnModelCreating(modelBuilder);
     }
 
-    // ─── IUnitOfWork Implementation ─────────────────────
+    // ─── IUnitOfWork ─────────────────────────────────────
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -57,14 +54,5 @@ public sealed class ApplicationDbContext : DbContext, IUnitOfWork
     public async Task RollbackTransactionAsync(CancellationToken ct = default)
     {
         await Database.RollbackTransactionAsync(ct);
-    }
-
-    // ─── Helpers ────────────────────────────────────────
-    private static LambdaExpression GenerateSoftDeleteFilter(Type entityType)
-    {
-        var parameter = Expression.Parameter(entityType, "e");
-        var property = Expression.Property(parameter, nameof(Entity.IsDeleted));
-        var condition = Expression.Equal(property, Expression.Constant(false));
-        return Expression.Lambda(condition, parameter);
     }
 }
