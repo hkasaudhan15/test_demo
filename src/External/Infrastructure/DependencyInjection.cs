@@ -3,6 +3,7 @@ using CleanArch.Application.Abstractions.Caching;
 using CleanArch.Application.Abstractions.Clock;
 using CleanArch.Application.Abstractions.Data;
 using CleanArch.Application.Abstractions.Idempotency;
+using CleanArch.Application.Abstractions.Settings;
 using CleanArch.CrossCutting.MultiTenancy;
 using CleanArch.CrossCutting.MultiTenancy.Interceptors;
 using CleanArch.CrossCutting.Outbox;
@@ -16,6 +17,7 @@ using CleanArch.Infrastructure.Idempotency;
 using CleanArch.Infrastructure.Persistence.EFCore.Context;
 using CleanArch.Infrastructure.Persistence.EFCore.Interceptors;
 using CleanArch.Infrastructure.Persistence.EFCore.Repositories;
+using CleanArch.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -76,6 +78,10 @@ public static class DependencyInjection
 
         // ── Idempotency ──────────────────────────────────
         services.AddScoped<IIdempotencyService, IdempotencyService>();
+
+        // ── Global Settings ───────────────────────────────
+        services.AddScoped<ISettingsRepository, SettingsRepository>();
+        services.AddScoped<ISettingsService, CachedSettingsService>();
 
         // ── Dapper connection factory ───────────────────
         services.AddSingleton<IDbConnectionFactory>(_ =>
