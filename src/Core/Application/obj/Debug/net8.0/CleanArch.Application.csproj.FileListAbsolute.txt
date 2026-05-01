@@ -1,0 +1,17 @@
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/obj/Debug/net8.0/CleanArch.Application.csproj.AssemblyReference.cache
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/obj/Debug/net8.0/CleanArch.Application.GeneratedMSBuildEditorConfig.editorconfig
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/obj/Debug/net8.0/CleanArch.Application.AssemblyInfoInputs.cache
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/obj/Debug/net8.0/CleanArch.Application.AssemblyInfo.cs
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/obj/Debug/net8.0/CleanArch.Application.csproj.CoreCompileInputs.cache
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/bin/Debug/net8.0/CleanArch.Application.deps.json
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/bin/Debug/net8.0/CleanArch.Application.dll
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/bin/Debug/net8.0/CleanArch.Application.pdb
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/bin/Debug/net8.0/CleanArch.Domain.dll
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/bin/Debug/net8.0/CleanArch.SharedKernel.dll
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/bin/Debug/net8.0/CleanArch.Domain.pdb
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/bin/Debug/net8.0/CleanArch.SharedKernel.pdb
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/obj/Debug/net8.0/CleanArc.054EF71E.Up2Date
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/obj/Debug/net8.0/CleanArch.Application.dll
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/obj/Debug/net8.0/refint/CleanArch.Application.dll
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/obj/Debug/net8.0/CleanArch.Application.pdb
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Application/obj/Debug/net8.0/ref/CleanArch.Application.dll

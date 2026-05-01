@@ -1,0 +1,17 @@
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/obj/Debug/net8.0/CleanArch.CrossCutting.csproj.AssemblyReference.cache
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/obj/Debug/net8.0/CleanArch.CrossCutting.GeneratedMSBuildEditorConfig.editorconfig
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/obj/Debug/net8.0/CleanArch.CrossCutting.AssemblyInfoInputs.cache
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/obj/Debug/net8.0/CleanArch.CrossCutting.AssemblyInfo.cs
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/obj/Debug/net8.0/CleanArch.CrossCutting.csproj.CoreCompileInputs.cache
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/bin/Debug/net8.0/CleanArch.CrossCutting.deps.json
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/bin/Debug/net8.0/CleanArch.CrossCutting.dll
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/bin/Debug/net8.0/CleanArch.CrossCutting.pdb
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/bin/Debug/net8.0/CleanArch.Domain.dll
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/bin/Debug/net8.0/CleanArch.SharedKernel.dll
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/bin/Debug/net8.0/CleanArch.Domain.pdb
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/bin/Debug/net8.0/CleanArch.SharedKernel.pdb
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/obj/Debug/net8.0/CleanArc.8B39533F.Up2Date
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/obj/Debug/net8.0/CleanArch.CrossCutting.dll
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/obj/Debug/net8.0/refint/CleanArch.CrossCutting.dll
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/obj/Debug/net8.0/CleanArch.CrossCutting.pdb
+/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/CrossCutting/obj/Debug/net8.0/ref/CleanArch.CrossCutting.dll

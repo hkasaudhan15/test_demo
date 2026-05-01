@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>CleanArch.Application</RootNamespace>
+    <AssemblyName>CleanArch.Application</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Application depends only on Domain + SharedKernel + Abstractions (MediatR, FluentValidation, AutoMapper) -->
+  <!-- NO infrastructure dependencies (EF Core, Redis, etc.) -->
+
+  <ItemGroup>
+    <!-- AutoMapper 13+ merged DI extensions, but requires .NET 10. Using 12.x for .NET 8 -->
+    <!-- CVE-2026-32933 (DoS via recursive graphs) mitigated by MaxDepth config in MappingProfile -->
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1">
+      <NoWarn>NU1903</NoWarn>
+    </PackageReference>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0" />
+    <PackageReference Include="MediatR" Version="12.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\CleanArch.Domain.csproj" />
+    <ProjectReference Include="..\SharedKernel\CleanArch.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>

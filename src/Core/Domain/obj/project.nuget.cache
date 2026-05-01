@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ckArXnp1oY8=",
+  "success": true,
+  "projectFilePath": "/home/hanuman-kasaudhan/Downloads/sisa-update-new/dotnet-api/src/Core/Domain/CleanArch.Domain.csproj",
+  "expectedPackageFiles": [
+    "/home/hanuman-kasaudhan/.nuget/packages/mediatr.contracts/2.0.1/mediatr.contracts.2.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
