@@ -3,13 +3,49 @@ using System.Linq.Expressions;
 namespace CleanArch.Domain.Specifications;
 
 /// <summary>
-/// Specification pattern — encapsulates complex query/filter logic in the domain.
+/// Specification pattern — encapsulates query logic in the domain layer.
+/// Supports filtering (Where), ordering, includes, and pagination.
 /// Composable via And(), Or(), Not() operators.
-/// EF Core compatible - uses parameter replacement instead of Expression.Invoke.
+/// EF Core compatible — uses parameter replacement instead of Expression.Invoke.
 /// </summary>
 public abstract class Specification<T>
 {
     public abstract Expression<Func<T, bool>> ToExpression();
+
+    public List<Expression<Func<T, object>>> Includes { get; } = [];
+    public List<string> IncludeStrings { get; } = [];
+    public Expression<Func<T, object>>? OrderByExpression { get; private set; }
+    public Expression<Func<T, object>>? OrderByDescendingExpression { get; private set; }
+    public int? Take { get; private set; }
+    public int? Skip { get; private set; }
+
+    protected void AddInclude(Expression<Func<T, object>> includeExpression)
+    {
+        Includes.Add(includeExpression);
+    }
+
+    protected void AddInclude(string includeString)
+    {
+        IncludeStrings.Add(includeString);
+    }
+
+    protected void ApplyOrderBy(Expression<Func<T, object>> orderByExpression)
+    {
+        OrderByExpression = orderByExpression;
+        OrderByDescendingExpression = null;
+    }
+
+    protected void ApplyOrderByDescending(Expression<Func<T, object>> orderByDescendingExpression)
+    {
+        OrderByDescendingExpression = orderByDescendingExpression;
+        OrderByExpression = null;
+    }
+
+    protected void ApplyPaging(int skip, int take)
+    {
+        Skip = skip;
+        Take = take;
+    }
 
     public bool IsSatisfiedBy(T entity)
     {

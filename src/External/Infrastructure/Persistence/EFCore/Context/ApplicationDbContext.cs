@@ -22,7 +22,6 @@ public sealed class ApplicationDbContext : DbContext, IUnitOfWork
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Apply all IEntityTypeConfiguration<T> from this assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
         // Global query filter for soft-delete
@@ -31,8 +30,7 @@ public sealed class ApplicationDbContext : DbContext, IUnitOfWork
             if (typeof(Entity).IsAssignableFrom(entityType.ClrType))
             {
                 modelBuilder.Entity(entityType.ClrType)
-                    .HasQueryFilter(
-                        GenerateSoftDeleteFilter(entityType.ClrType));
+                    .HasQueryFilter(GenerateSoftDeleteFilter(entityType.ClrType));
             }
         }
 
@@ -40,6 +38,12 @@ public sealed class ApplicationDbContext : DbContext, IUnitOfWork
     }
 
     // ─── IUnitOfWork Implementation ─────────────────────
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task BeginTransactionAsync(CancellationToken ct = default)
     {
         await Database.BeginTransactionAsync(ct);
@@ -58,10 +62,9 @@ public sealed class ApplicationDbContext : DbContext, IUnitOfWork
     // ─── Helpers ────────────────────────────────────────
     private static LambdaExpression GenerateSoftDeleteFilter(Type entityType)
     {
-        var parameter = System.Linq.Expressions.Expression.Parameter(entityType, "e");
-        var property = System.Linq.Expressions.Expression.Property(parameter, nameof(Entity.IsDeleted));
-        var condition = System.Linq.Expressions.Expression.Equal(property, System.Linq.Expressions.Expression.Constant(false));
-        return System.Linq.Expressions.Expression.Lambda(condition, parameter);
+        var parameter = Expression.Parameter(entityType, "e");
+        var property = Expression.Property(parameter, nameof(Entity.IsDeleted));
+        var condition = Expression.Equal(property, Expression.Constant(false));
+        return Expression.Lambda(condition, parameter);
     }
 }
-

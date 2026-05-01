@@ -36,7 +36,9 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
         var errors = validationResults
             .SelectMany(r => r.Errors)
             .Where(f => f is not null)
-            .Select(f => new Error(f.PropertyName, f.ErrorMessage))
+            .Select(f => new Error(
+                f.ErrorCode ?? $"Validation.{f.PropertyName}",
+                f.ErrorMessage))
             .Distinct()
             .ToArray();
 

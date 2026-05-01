@@ -127,30 +127,32 @@ public static class ServiceCollectionExtensions
             {
                 builder
                     .WithOrigins(allowedOrigins)
-                    .AllowAnyMethod()
+                    .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                     .AllowAnyHeader()
-                    .AllowCredentials();
+                    .AllowCredentials()
+                    .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
             });
         });
 
-        // ── Rate Limiting ───────────────────────────────
+        // ── Rate Limiting (configurable via appsettings.json) ──
+        var rateLimitSection = configuration.GetSection("RateLimiting");
         services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
             options.AddFixedWindowLimiter("fixed", limiterOptions =>
             {
-                limiterOptions.PermitLimit = 100;
-                limiterOptions.Window = TimeSpan.FromMinutes(1);
+                limiterOptions.PermitLimit = rateLimitSection.GetValue("Fixed:PermitLimit", 100);
+                limiterOptions.Window = TimeSpan.FromMinutes(rateLimitSection.GetValue("Fixed:WindowMinutes", 1));
                 limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                limiterOptions.QueueLimit = 10;
+                limiterOptions.QueueLimit = rateLimitSection.GetValue("Fixed:QueueLimit", 10);
             });
 
             options.AddSlidingWindowLimiter("sliding", limiterOptions =>
             {
-                limiterOptions.PermitLimit = 50;
-                limiterOptions.Window = TimeSpan.FromMinutes(1);
-                limiterOptions.SegmentsPerWindow = 6;
+                limiterOptions.PermitLimit = rateLimitSection.GetValue("Sliding:PermitLimit", 50);
+                limiterOptions.Window = TimeSpan.FromMinutes(rateLimitSection.GetValue("Sliding:WindowMinutes", 1));
+                limiterOptions.SegmentsPerWindow = rateLimitSection.GetValue("Sliding:SegmentsPerWindow", 6);
             });
         });
 

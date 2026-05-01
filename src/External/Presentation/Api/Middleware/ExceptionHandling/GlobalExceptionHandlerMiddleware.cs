@@ -2,12 +2,15 @@ using System.Net;
 using System.Text.Json;
 using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Primitives.Exceptions;
+using CleanArch.SharedKernel.Constants;
+using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Presentation.Api.Middleware.ExceptionHandling;
 
 /// <summary>
 /// Global exception handler — catches ALL unhandled exceptions
-/// and maps them to proper HTTP status codes with consistent response shape.
+/// and maps them to proper HTTP status codes with a consistent
+/// <see cref="ApiResponse{T}"/> envelope that includes the correlation ID.
 /// </summary>
 public sealed class GlobalExceptionHandlerMiddleware
 {
@@ -34,6 +37,12 @@ public sealed class GlobalExceptionHandlerMiddleware
         {
             await _next(context);
         }
+        catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+        {
+            // Client disconnected — no point in writing a response.
+            _logger.LogInformation("Request was cancelled by the client");
+            context.Response.StatusCode = 499; // nginx-style "Client Closed Request"
+        }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Unhandled exception: {Message}", exception.Message);
@@ -43,40 +52,22 @@ public sealed class GlobalExceptionHandlerMiddleware
 
     private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        var (statusCode, response) = exception switch
+        var (statusCode, message) = exception switch
         {
-            BusinessRuleException e => (
-                HttpStatusCode.BadRequest,
-                ApiResponse<object>.Fail(e.Message)),
-
-            ConcurrencyException e => (
-                HttpStatusCode.Conflict,
-                ApiResponse<object>.Fail(e.Message)),
-
-            UnauthorizedAccessException => (
-                HttpStatusCode.Unauthorized,
-                ApiResponse<object>.Fail("You are not authenticated.")),
-
-            ArgumentException e => (
-                HttpStatusCode.BadRequest,
-                ApiResponse<object>.Fail(e.Message)),
-
-            KeyNotFoundException e => (
-                HttpStatusCode.NotFound,
-                ApiResponse<object>.Fail(e.Message)),
-
-            OperationCanceledException => (
-                HttpStatusCode.RequestTimeout,
-                ApiResponse<object>.Fail("The request was cancelled.")),
-
-            _ => (
-                HttpStatusCode.InternalServerError,
-                ApiResponse<object>.Fail("An unexpected error occurred. Please try again later."))
+            BusinessRuleException e => (HttpStatusCode.BadRequest, e.Message),
+            ConcurrencyException e => (HttpStatusCode.Conflict, e.Message),
+            DbUpdateConcurrencyException => (HttpStatusCode.Conflict, "The record was modified by another user. Please refresh and try again."),
+            UnauthorizedAccessException => (HttpStatusCode.Unauthorized, "You are not authenticated."),
+            ArgumentException e => (HttpStatusCode.BadRequest, e.Message),
+            KeyNotFoundException e => (HttpStatusCode.NotFound, e.Message),
+            OperationCanceledException => (HttpStatusCode.RequestTimeout, "The request was cancelled."),
+            _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred. Please try again later.")
         };
 
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
+        var response = ApiResponse<object>.Fail(message);
         var json = JsonSerializer.Serialize(response, JsonOptions);
         await context.Response.WriteAsync(json);
     }
