@@ -83,6 +83,10 @@ public static class DependencyInjection
         services.AddScoped<ISettingsRepository, SettingsRepository>();
         services.AddScoped<ISettingsService, CachedSettingsService>();
 
+        // ── Tenant Settings ───────────────────────────────
+        services.AddScoped<ITenantSettingsRepository, TenantSettingsRepository>();
+        services.AddScoped<ITenantSettingsService, CachedTenantSettingsService>();
+
         // ── Dapper connection factory ───────────────────
         services.AddSingleton<IDbConnectionFactory>(_ =>
             new SqlConnectionFactory(configuration.GetConnectionString("DefaultConnection")!));
