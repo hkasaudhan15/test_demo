@@ -1,3 +1,4 @@
+using CleanArch.CrossCutting.MultiTenancy.Abstractions;
 using CleanArch.Domain.Abstractions.Repositories;
 using CleanArch.Infrastructure.Persistence.EFCore.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -8,16 +9,20 @@ namespace CleanArch.Infrastructure.Persistence.EFCore.Context;
 /// Application DbContext — central data access point.
 /// Implements <see cref="IUnitOfWork"/> for transactional consistency.
 ///
-/// Domain conventions (audit fields, soft-delete filters, concurrency tokens,
-/// domain event exclusion) are applied automatically via
+/// Domain conventions (audit fields, soft-delete filters, tenant isolation,
+/// concurrency tokens, domain event exclusion) are applied automatically via
 /// <see cref="ModelBuilderExtensions.ApplyDomainConventions"/> so individual
 /// entity configurations only need to declare their own table-specific mappings.
 /// </summary>
 public sealed class ApplicationDbContext : DbContext, IUnitOfWork
 {
+    private readonly ITenantProvider _tenantProvider;
+
     public ApplicationDbContext(
-        DbContextOptions<ApplicationDbContext> options) : base(options)
+        DbContextOptions<ApplicationDbContext> options,
+        ITenantProvider tenantProvider) : base(options)
     {
+        _tenantProvider = tenantProvider;
     }
 
     // ─── Register DbSets here ───────────────────────────
@@ -28,8 +33,8 @@ public sealed class ApplicationDbContext : DbContext, IUnitOfWork
         // 1. Apply all IEntityTypeConfiguration<T> from Infrastructure assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
-        // 2. Apply domain conventions (audit, soft-delete, concurrency, events)
-        modelBuilder.ApplyDomainConventions();
+        // 2. Apply domain conventions (audit, soft-delete, tenant, concurrency, events)
+        modelBuilder.ApplyDomainConventions(_tenantProvider);
 
         base.OnModelCreating(modelBuilder);
     }

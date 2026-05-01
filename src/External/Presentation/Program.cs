@@ -1,4 +1,5 @@
 using CleanArch.Application;
+using CleanArch.CrossCutting.MultiTenancy;
 using CleanArch.Infrastructure;
 using CleanArch.Presentation.Api.Extensions;
 using CleanArch.Presentation.Api.Middleware.Correlation;
@@ -39,36 +40,39 @@ try
     // 1. Correlation ID — first, so every log entry has it
     app.UseMiddleware<CorrelationIdMiddleware>();
 
-    // 2. Global exception handler — catches everything below
+    // 2. Tenant resolution — resolve tenant from header before anything else
+    app.UseMiddleware<TenantResolutionMiddleware>();
+
+    // 3. Global exception handler — catches everything below
     app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
-    // 3. Serilog request logging
+    // 4. Serilog request logging
     app.UseSerilogRequestLogging(options =>
     {
         options.EnrichDiagnosticContext = RequestLoggingEnricher.EnrichFromRequest;
     });
 
-    // 4. HTTPS redirect
+    // 5. HTTPS redirect
     if (!app.Environment.IsDevelopment())
     {
         app.UseHsts();
     }
     app.UseHttpsRedirection();
 
-    // 5. Response compression
+    // 6. Response compression
     app.UseResponseCompression();
 
-    // 6. CORS
+    // 7. CORS
     app.UseCors("DefaultPolicy");
 
-    // 7. Rate limiting
+    // 8. Rate limiting
     app.UseRateLimiter();
 
-    // 8. Authentication & Authorization
+    // 9. Authentication & Authorization
     app.UseAuthentication();
     app.UseAuthorization();
 
-    // 9. Swagger (dev/staging only)
+    // 10. Swagger (dev/staging only)
     if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
     {
         app.UseSwagger();
@@ -80,10 +84,10 @@ try
         });
     }
 
-    // 10. Health checks
+    // 11. Health checks
     app.MapHealthChecks("/health");
 
-    // 11. Map controllers
+    // 12. Map controllers
     app.MapControllers();
 
     // ── Run ─────────────────────────────────────────────

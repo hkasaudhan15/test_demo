@@ -3,6 +3,8 @@ using CleanArch.Application.Abstractions.Caching;
 using CleanArch.Application.Abstractions.Clock;
 using CleanArch.Application.Abstractions.Data;
 using CleanArch.Application.Abstractions.Idempotency;
+using CleanArch.CrossCutting.MultiTenancy;
+using CleanArch.CrossCutting.MultiTenancy.Interceptors;
 using CleanArch.CrossCutting.Outbox;
 using CleanArch.CrossCutting.Outbox.Interceptors;
 using CleanArch.Domain.Abstractions.Repositories;
@@ -30,6 +32,10 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // ── Multi-Tenancy ─────────────────────────────────
+        // Registers TenantProvider, HeaderTenantResolver, TenantInterceptor
+        services.AddMultiTenancy();
+
         // ── EF Core Interceptors ─────────────────────────
         // Scoped interceptors depend on Scoped services
         // (ICurrentUserService, IPublisher, IDateTimeProvider)
@@ -55,6 +61,7 @@ public static class DependencyInjection
                 });
 
             options.AddInterceptors(
+                sp.GetRequiredService<TenantInterceptor>(),
                 sp.GetRequiredService<AuditableEntityInterceptor>(),
                 sp.GetRequiredService<SoftDeleteInterceptor>(),
                 sp.GetRequiredService<OutboxInterceptor>());
