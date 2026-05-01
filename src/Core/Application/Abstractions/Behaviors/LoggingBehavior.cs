@@ -23,20 +23,18 @@ public sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRe
         CancellationToken ct)
     {
         var requestName = typeof(TRequest).Name;
-        
-        _logger.LogInformation("📥 Handling {RequestName}", requestName);
 
-        // Only serialize request payload if Debug level is enabled
+        _logger.LogInformation("Handling {RequestName}", requestName);
+
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("📥 {RequestName} payload: {@Request}", requestName, request);
+            _logger.LogDebug("{RequestName} payload: {@Request}", requestName, request);
         }
 
         var response = await next();
 
-        _logger.LogInformation("📤 Handled {RequestName}", requestName);
+        _logger.LogInformation("Handled {RequestName}", requestName);
 
         return response;
     }
 }
-

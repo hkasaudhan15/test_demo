@@ -21,11 +21,11 @@ var app = builder.Build();
 
 if (args.Contains("--migrate"))
 {
-    Console.WriteLine("🔄 Applying pending migrations...");
+    Console.WriteLine("Applying pending migrations...");
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await db.Database.MigrateAsync();
-    Console.WriteLine("✅ Migrations applied successfully.");
+    Console.WriteLine("Migrations applied successfully.");
 }
 else
 {

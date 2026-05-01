@@ -11,7 +11,8 @@ namespace CleanArch.CrossCutting.Outbox.Processing;
 
 /// <summary>
 /// Background service that processes outbox messages for reliable event publishing.
-/// Ensures domain events are eventually published even if the initial publish fails.
+/// Polls the OutboxMessages table, deserializes domain events, and publishes
+/// them via MediatR. Failed messages are retried up to <see cref="MaxRetries"/> times.
 /// </summary>
 public sealed class OutboxProcessor : BackgroundService
 {
@@ -36,7 +37,7 @@ public sealed class OutboxProcessor : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("📬 Outbox Processor started");
+        _logger.LogInformation("Outbox Processor started");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -44,20 +45,28 @@ public sealed class OutboxProcessor : BackgroundService
             {
                 await ProcessOutboxMessagesAsync(stoppingToken);
             }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                break;
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "💥 Error processing outbox messages");
+                _logger.LogError(ex, "Error processing outbox messages");
             }
 
             await Task.Delay(_interval, stoppingToken);
         }
 
-        _logger.LogInformation("📭 Outbox Processor stopped");
+        _logger.LogInformation("Outbox Processor stopped");
     }
 
     private async Task ProcessOutboxMessagesAsync(CancellationToken cancellationToken)
     {
         using var scope = _serviceProvider.CreateScope();
+
+        // Resolve the concrete DbContext registered by the application.
+        // Using DbContext directly requires it to be registered; we resolve via
+        // the IServiceProvider to allow the host to decide the concrete type.
         var dbContext = scope.ServiceProvider.GetRequiredService<DbContext>();
         var publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
 
@@ -70,16 +79,16 @@ public sealed class OutboxProcessor : BackgroundService
         if (messages.Count == 0)
             return;
 
-        _logger.LogInformation("📨 Processing {Count} outbox messages", messages.Count);
+        _logger.LogInformation("Processing {Count} outbox messages", messages.Count);
 
         foreach (var message in messages)
         {
             try
             {
                 var domainEventType = Type.GetType(message.Type);
-                if (domainEventType == null)
+                if (domainEventType is null)
                 {
-                    _logger.LogWarning("⚠️ Unknown event type: {Type}", message.Type);
+                    _logger.LogWarning("Unknown event type: {Type}. Marking as processed.", message.Type);
                     message.Error = $"Unknown event type: {message.Type}";
                     message.ProcessedOnUtc = DateTime.UtcNow;
                     continue;
@@ -94,8 +103,8 @@ public sealed class OutboxProcessor : BackgroundService
                 {
                     await publisher.Publish(typedEvent, cancellationToken);
                     message.ProcessedOnUtc = DateTime.UtcNow;
-                    
-                    _logger.LogDebug("✅ Processed outbox message {MessageId} of type {Type}",
+
+                    _logger.LogDebug("Processed outbox message {MessageId} of type {Type}",
                         message.Id, message.Type);
                 }
                 else
@@ -108,16 +117,16 @@ public sealed class OutboxProcessor : BackgroundService
             {
                 message.RetryCount++;
                 message.Error = ex.ToString();
-                
+
                 _logger.LogError(ex,
-                    "❌ Failed to process outbox message {MessageId} (Retry {RetryCount}/{MaxRetries})",
+                    "Failed to process outbox message {MessageId} (Retry {RetryCount}/{MaxRetries})",
                     message.Id, message.RetryCount, MaxRetries);
 
                 if (message.RetryCount >= MaxRetries)
                 {
                     message.ProcessedOnUtc = DateTime.UtcNow;
                     _logger.LogError(
-                        "💀 Outbox message {MessageId} exceeded max retries and will be marked as processed",
+                        "Outbox message {MessageId} exceeded max retries and has been marked as dead-lettered",
                         message.Id);
                 }
             }

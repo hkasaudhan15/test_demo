@@ -162,10 +162,7 @@ public static class ServiceCollectionExtensions
             options.Providers.Add<GzipCompressionProvider>();
         });
 
-        // ── Health Checks ───────────────────────────────
-        services.AddHealthChecks();
-        // .AddSqlServer(configuration.GetConnectionString("DefaultConnection")!)
-        // .AddRedis(configuration.GetConnectionString("Redis")!);
+        // Health checks are registered in Infrastructure.DependencyInjection
 
         return services;
     }

@@ -1,8 +1,0 @@
-{
-  "CleanArch.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/hanuman-kasaudhan\/Downloads\/sisa-update-new\/dotnet-api\/src\/Core\/Application",
-  "CleanArch.CrossCutting, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/hanuman-kasaudhan\/Downloads\/sisa-update-new\/dotnet-api\/src\/CrossCutting",
-  "CleanArch.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/hanuman-kasaudhan\/Downloads\/sisa-update-new\/dotnet-api\/src\/Core\/Domain",
-  "CleanArch.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/hanuman-kasaudhan\/Downloads\/sisa-update-new\/dotnet-api\/src\/External\/Infrastructure",
-  "CleanArch.Presentation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/hanuman-kasaudhan\/Downloads\/sisa-update-new\/dotnet-api\/src\/External\/Presentation",
-  "CleanArch.SharedKernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/home\/hanuman-kasaudhan\/Downloads\/sisa-update-new\/dotnet-api\/src\/Core\/SharedKernel"
-}

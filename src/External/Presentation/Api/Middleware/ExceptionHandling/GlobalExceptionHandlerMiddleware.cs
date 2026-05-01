@@ -36,7 +36,7 @@ public sealed class GlobalExceptionHandlerMiddleware
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "💥 Unhandled exception: {Message}", exception.Message);
+            _logger.LogError(exception, "Unhandled exception: {Message}", exception.Message);
             await HandleExceptionAsync(context, exception);
         }
     }

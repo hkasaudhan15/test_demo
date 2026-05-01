@@ -1,0 +1,45 @@
+## .NET / Visual Studio
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+*.userosscache
+*.userprefs
+*.sln.docstates
+
+## NuGet
+*.nupkg
+**/packages/*
+project.lock.json
+project.fragment.lock.json
+
+## IDE
+.vs/
+.vscode/
+.idea/
+*.swp
+*~
+
+## Rider
+_ReSharper*/
+*.DotSettings.user
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Secrets / local overrides
+appsettings.*.local.json
+*.pfx
+*.pem
+.env
+.env.*
+
+## Test results
+TestResults/
+coverage/
+
+## Docker
+docker-compose.override.yml

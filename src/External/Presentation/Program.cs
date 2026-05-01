@@ -16,7 +16,7 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    Log.Information("🚀 Starting CleanArch API...");
+    Log.Information("Starting CleanArch API...");
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -91,11 +91,11 @@ try
 }
 catch (Exception ex) when (ex is not HostAbortedException)
 {
-    Log.Fatal(ex, "💀 Application terminated unexpectedly");
+    Log.Fatal(ex, "Application terminated unexpectedly");
 }
 finally
 {
-    Log.Information("🛑 Application shutting down...");
+    Log.Information("Application shutting down...");
     Log.CloseAndFlush();
 }
 

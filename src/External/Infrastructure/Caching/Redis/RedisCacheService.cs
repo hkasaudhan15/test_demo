@@ -7,6 +7,8 @@ namespace CleanArch.Infrastructure.Caching.Redis;
 
 /// <summary>
 /// Redis-backed distributed cache implementation with graceful degradation.
+/// All operations swallow cache failures so the application continues
+/// to function (albeit without caching) when Redis is unavailable.
 /// </summary>
 public sealed class RedisCacheService : ICacheService
 {
@@ -33,8 +35,8 @@ public sealed class RedisCacheService : ICacheService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Redis cache GET failed for key: {Key}. Falling back to source.", key);
-            return default; // Graceful degradation
+            _logger.LogWarning(ex, "Redis GET failed for key {Key}. Falling back to source.", key);
+            return default;
         }
     }
 
@@ -52,8 +54,7 @@ public sealed class RedisCacheService : ICacheService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Redis cache SET failed for key: {Key}. Continuing without cache.", key);
-            // Don't throw - cache failures should not break the application
+            _logger.LogWarning(ex, "Redis SET failed for key {Key}. Continuing without cache.", key);
         }
     }
 
@@ -65,18 +66,21 @@ public sealed class RedisCacheService : ICacheService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Redis cache REMOVE failed for key: {Key}.", key);
-            // Don't throw - cache failures should not break the application
+            _logger.LogWarning(ex, "Redis REMOVE failed for key {Key}.", key);
         }
     }
 
     public Task RemoveByPrefixAsync(string prefixKey, CancellationToken ct = default)
     {
-        // TODO: Implement using IConnectionMultiplexer for production use.
-        // Requires direct StackExchange.Redis connection to use SCAN + DEL.
-        // Example: var server = _multiplexer.GetServer(...); var keys = server.Keys(pattern: $"{prefixKey}*");
-        throw new NotSupportedException(
-            "Prefix-based cache removal requires IConnectionMultiplexer. " +
-            "Inject IConnectionMultiplexer and implement SCAN-based key deletion.");
+        // IDistributedCache does not expose key-scanning.
+        // For production use with prefix-based invalidation, inject
+        // IConnectionMultiplexer directly and use SCAN + UNLINK.
+        // Logging the no-op so callers are aware.
+        _logger.LogWarning(
+            "RemoveByPrefixAsync is a no-op with IDistributedCache. " +
+            "Inject IConnectionMultiplexer for prefix-based invalidation. Prefix: {Prefix}",
+            prefixKey);
+
+        return Task.CompletedTask;
     }
 }

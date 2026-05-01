@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using Asp.Versioning;
 using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Primitives.Results;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArch.Presentation.Api.Controllers;
@@ -53,6 +55,7 @@ public abstract class BaseApiController : ControllerBase
         return HandleError(result.Error);
     }
 
+    [SuppressMessage("Performance", "CA1859:Use concrete types when possible for improved performance", Justification = "Return type must remain IActionResult for polymorphic dispatch")]
     private IActionResult HandleError(Error error)
     {
         return error.Type switch
@@ -64,7 +67,7 @@ public abstract class BaseApiController : ControllerBase
                         e => new[] { e.Message }))),
             ErrorType.NotFound => NotFound(ApiResponse<object>.Fail(error.Message)),
             ErrorType.Unauthorized => Unauthorized(ApiResponse<object>.Fail(error.Message)),
-            ErrorType.Forbidden => Forbid(),
+            ErrorType.Forbidden => StatusCode(StatusCodes.Status403Forbidden, ApiResponse<object>.Fail(error.Message)),
             ErrorType.Conflict => Conflict(ApiResponse<object>.Fail(error.Message)),
             _ => BadRequest(ApiResponse<object>.Fail(error.Message))
         };

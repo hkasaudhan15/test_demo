@@ -33,7 +33,7 @@ public sealed class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior
         if (stopwatch.ElapsedMilliseconds > SlowRequestThresholdMs)
         {
             _logger.LogWarning(
-                "⚠️ Slow Request: {RequestName} took {ElapsedMs}ms | {@Request}",
+                "Slow request: {RequestName} took {ElapsedMs}ms | {@Request}",
                 typeof(TRequest).Name,
                 stopwatch.ElapsedMilliseconds,
                 request);

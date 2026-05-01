@@ -6,20 +6,19 @@ namespace CleanArch.Infrastructure.Persistence.EFCore.Configurations;
 
 /// <summary>
 /// Base configuration for all aggregate roots.
-/// Configures concurrency token and common properties.
+/// Configures row version concurrency token and common audit properties.
 /// </summary>
 public abstract class AggregateRootConfiguration<TEntity> : IEntityTypeConfiguration<TEntity>
     where TEntity : AggregateRoot
 {
     public virtual void Configure(EntityTypeBuilder<TEntity> builder)
     {
-        // Primary key
         builder.HasKey(e => e.Id);
 
-        // Concurrency token for optimistic concurrency control
-        builder.Property(e => e.Version)
-            .IsConcurrencyToken()
-            .HasDefaultValue(0);
+        // SQL Server rowversion — auto-incremented by the database engine on every write.
+        // EF Core checks this value on UPDATE/DELETE and throws DbUpdateConcurrencyException on mismatch.
+        builder.Property(e => e.RowVersion)
+            .IsRowVersion();
 
         // Audit fields
         builder.Property(e => e.CreatedOnUtc)
@@ -43,7 +42,7 @@ public abstract class AggregateRootConfiguration<TEntity> : IEntityTypeConfigura
         builder.Property(e => e.DeletedBy)
             .HasMaxLength(256);
 
-        // Ignore domain events (not persisted)
+        // Domain events are transient — never persisted
         builder.Ignore(e => e.DomainEvents);
     }
 }

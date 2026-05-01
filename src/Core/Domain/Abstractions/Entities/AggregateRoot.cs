@@ -12,8 +12,9 @@ public abstract class AggregateRoot : Entity
     protected AggregateRoot() { } // EF Core
 
     /// <summary>
-    /// Version for optimistic concurrency control.
-    /// Incremented on every save via EF Core interceptor.
+    /// Row version for optimistic concurrency control.
+    /// Configured as a SQL Server rowversion/timestamp column
+    /// that is automatically updated by the database on every write.
     /// </summary>
-    public int Version { get; set; }
+    public byte[] RowVersion { get; private set; } = [];
 }
