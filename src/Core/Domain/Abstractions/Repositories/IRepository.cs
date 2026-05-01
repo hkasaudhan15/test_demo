@@ -19,6 +19,7 @@ public interface IRepository<TEntity> where TEntity : AggregateRoot
     Task<TEntity?> FirstOrDefaultAsync(Specification<TEntity> specification, CancellationToken ct = default);
     Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
     Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken ct = default);
+    Task<int> CountAsync(Specification<TEntity> specification, CancellationToken ct = default);
 
     // ─── Write ──────────────────────────────────────────
     void Add(TEntity entity);

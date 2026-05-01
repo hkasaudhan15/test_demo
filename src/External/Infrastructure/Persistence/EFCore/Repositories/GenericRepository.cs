@@ -75,6 +75,15 @@ public class GenericRepository<TEntity> : IRepository<TEntity>
             : await DbSet.AsNoTracking().CountAsync(predicate, ct);
     }
 
+    public async Task<int> CountAsync(
+        Specification<TEntity> specification,
+        CancellationToken ct = default)
+    {
+        return await DbSet.AsNoTracking()
+            .Where(specification.ToExpression())
+            .CountAsync(ct);
+    }
+
     public void Add(TEntity entity) => DbSet.Add(entity);
     public void AddRange(IEnumerable<TEntity> entities) => DbSet.AddRange(entities);
     public void Update(TEntity entity) => DbSet.Update(entity);
