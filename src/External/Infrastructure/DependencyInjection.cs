@@ -4,7 +4,9 @@ using CleanArch.Application.Abstractions.Clock;
 using CleanArch.Application.Abstractions.Data;
 using CleanArch.Application.Abstractions.Idempotency;
 using CleanArch.Application.Abstractions.Settings;
+using CleanArch.Application.Abstractions.Tenants;
 using CleanArch.CrossCutting.MultiTenancy;
+using CleanArch.CrossCutting.MultiTenancy.Abstractions;
 using CleanArch.CrossCutting.MultiTenancy.Interceptors;
 using CleanArch.CrossCutting.Outbox;
 using CleanArch.CrossCutting.Outbox.Interceptors;
@@ -18,6 +20,7 @@ using CleanArch.Infrastructure.Persistence.EFCore.Context;
 using CleanArch.Infrastructure.Persistence.EFCore.Interceptors;
 using CleanArch.Infrastructure.Persistence.EFCore.Repositories;
 using CleanArch.Infrastructure.Settings;
+using CleanArch.Infrastructure.Tenants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,6 +89,10 @@ public static class DependencyInjection
         // ── Tenant Settings ───────────────────────────────
         services.AddScoped<ITenantSettingsRepository, TenantSettingsRepository>();
         services.AddScoped<ITenantSettingsService, CachedTenantSettingsService>();
+
+        // ── Tenant Management ─────────────────────────────
+        services.AddScoped<ITenantRepository, TenantRepository>();
+        services.AddScoped<ITenantStore, EfCoreTenantStore>();
 
         // ── Dapper connection factory ───────────────────
         services.AddSingleton<IDbConnectionFactory>(_ =>
