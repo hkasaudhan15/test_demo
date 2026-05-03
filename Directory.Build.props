@@ -1,0 +1,18 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Suppress analyzer rules that conflict with DDD/CQRS patterns -->
+    <!-- CA1000: Static on generics (factory patterns), CA1711: EventHandler suffix (MediatR convention) -->
+    <!-- CA1716: Reserved keywords (Error, To), CA1725: param name 'ct' (CancellationToken shorthand) -->
+    <!-- CA1848: LoggerMessage delegates (overkill for template code) -->
+    <!-- CA1707: Underscores in identifiers (_Template namespace convention) -->
+    <!-- CA1305: IFormatProvider (false positive on Serilog, EF Core APIs) -->
+    <NoWarn>$(NoWarn);CA1000;CA1305;CA1707;CA1711;CA1716;CA1725;CA1848</NoWarn>
+  </PropertyGroup>
+</Project>
+

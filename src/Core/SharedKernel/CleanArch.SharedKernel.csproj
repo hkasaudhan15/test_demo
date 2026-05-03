@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>CleanArch.SharedKernel</RootNamespace>
+    <AssemblyName>CleanArch.SharedKernel</AssemblyName>
+  </PropertyGroup>
+
+  <!-- SharedKernel has ZERO external dependencies -->
+
+</Project>

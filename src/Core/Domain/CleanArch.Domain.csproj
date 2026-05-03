@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>CleanArch.Domain</RootNamespace>
+    <AssemblyName>CleanArch.Domain</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Domain depends only on MediatR.Contracts (interface-only, zero implementation) -->
+  <!-- This is the accepted Clean Architecture pattern for domain event dispatch -->
+
+  <ItemGroup>
+    <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharedKernel\CleanArch.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <!-- Allow Infrastructure interceptors to set audit fields (internal set) -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="CleanArch.Infrastructure" />
+    <InternalsVisibleTo Include="CleanArch.UnitTests" />
+  </ItemGroup>
+
+</Project>
+
